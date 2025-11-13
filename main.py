@@ -405,6 +405,12 @@ class App(customtkinter.CTk):
         )
         self.btn_stop_batch.grid(row=0, column=3, sticky="w")
 
+        self.btn_download_now = customtkinter.CTkButton(
+            src_header, text="⬇️ Download", width=120,
+            command=self.download_blob_button_click
+        )
+        self.btn_download_now.grid(row=0, column=4, sticky="w", padx=(8, 0))
+
         # Khung list + scrollbar
         list_container = customtkinter.CTkFrame(source_wrap, fg_color="transparent")
         list_container.grid(row=1, column=0, sticky="nsew", padx=6, pady=6)
@@ -2500,6 +2506,105 @@ class App(customtkinter.CTk):
             # fallback: ngay trong base_folder
             return base_folder
 
+    def _pick_active_profile(self):
+        # Ưu tiên: profile đang chạy & được tick; nếu không có, lấy bất kỳ profile đang chạy.
+        running = set(self.running_browsers.keys())
+        for name, w in self.profile_widgets.items():
+            try:
+                if w["checkbox"].get() == 1 and name in running:
+                    return name
+            except Exception:
+                pass
+        return next(iter(running), None)
+    
+    def _sanitize_filename(self, name: str, default_ext=".mp3") -> str:
+        import re, os
+        name = (name or "").strip()
+        if not name:
+            name = "output"
+        # loại ký tự cấm trên Windows
+        name = re.sub(r'[<>:"/\\|?*]+', "_", name)
+        name = re.sub(r"\s+", "_", name)
+        if not os.path.splitext(name)[1]:
+            name += default_ext
+        return name[:120]  # tránh quá dài
+
+    def _js_fetch_blob_base64(self) -> str:
+        # script async: đọc blob từ <a id="gemini-download-merged-btn"> và trả {ok, b64, name, reason}
+        return r"""
+    var done = arguments[0];
+    (async () => {
+    try {
+        const a = document.getElementById('gemini-download-merged-btn');
+        if (!a || !a.href || !a.href.startsWith('blob:')) {
+        done({ ok: false, reason: 'Không tìm thấy blob URL.' });
+        return;
+        }
+        let fileName = a.getAttribute('download') || 'output.mp3';
+        const resp = await fetch(a.href);
+        if (!resp.ok) {
+        done({ ok: false, reason: 'fetch blob thất bại: ' + resp.status });
+        return;
+        }
+        const buf = await resp.arrayBuffer();
+        const bytes = new Uint8Array(buf);
+        let binary = '';
+        const chunkSize = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+        const sub = bytes.subarray(i, i + chunkSize);
+        binary += String.fromCharCode.apply(null, sub);
+        }
+        const b64 = btoa(binary);
+        done({ ok: true, b64: b64, name: fileName });
+    } catch (e) {
+        done({ ok: false, reason: String(e) });
+    }
+    })();
+    """
+
+    def _save_base64_to_file(self, b64: str, dest_path: str) -> str:
+        import base64, os
+        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+        with open(dest_path, "wb") as f:
+            f.write(base64.b64decode(b64))
+        return dest_path
+
+    def download_blob_button_click(self):
+        # 1) Chọn profile đang chạy
+        prof = self._pick_active_profile()
+        if not prof:
+            self._log_from_thread("⚠️ Không có profile nào đang chạy. Vui lòng khởi động 1 profile.")
+            return
+        drv = self.running_browsers.get(prof)
+        if not drv:
+            self._log_from_thread("⚠️ Không lấy được driver của profile.")
+            return
+
+        # 2) Chạy JS async để lấy blob -> base64
+        self._log_from_thread("🔎 Đang kiểm tra blob để tải...")
+        try:
+            res = drv.execute_async_script(self._js_fetch_blob_base64())
+        except Exception as e:
+            self._log_from_thread(f"❌ Lỗi khi thực thi JS: {e}")
+            return
+
+        if not res or not res.get("ok"):
+            reason = (res or {}).get("reason", "Không rõ")
+            self._log_from_thread(f"❌ Không tìm thấy blob: {reason}")
+            return
+
+        # 3) Xác định tên file + thư mục lưu (ưu tiên download_path/folder_path)
+        raw_name = res.get("name") or "output.mp3"
+        safe_name = self._sanitize_filename(raw_name, ".mp3")
+        dest_dir = self.get_download_dir(prof)
+        dest_path = os.path.join(dest_dir, safe_name)
+
+        # 4) Ghi file
+        try:
+            path = self._save_base64_to_file(res["b64"], dest_path)
+            self._log_from_thread(f"✅ Đã tải blob về: {path}")
+        except Exception as e:
+            self._log_from_thread(f"❌ Lỗi ghi file: {e}")
 
 if __name__ == '__main__':
     try:

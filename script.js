@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DUC LOI - Clone Voice (Không cần API) - Modded
 // @namespace    mmx-secure
-// @version      15.3.0
+// @version      21.0
 // @description  Tạo audio giọng nói clone theo ý của bạn. Không giới hạn. Thêm chức năng Ghép hội thoại, Đổi văn bản hàng loạt & Thiết lập dấu câu (bao gồm dấu xuống dòng).
 // @author       HUỲNH ĐỨC LỢI ( Zalo: 0835795597) - Đã chỉnh sửa
 // @match        https://www.minimax.io/audio*
@@ -55,7 +55,7 @@
 /* Log Section Styles */
 .log-section{background:#44475a;border:1px solid #27304a;border-radius:4px;padding:15px;margin-top:15px}
 .log-section h2{font-size:16px;font-weight:700;margin-bottom:10px;color:#bd93f9}
-.log-container{background:#282a36;border:1px solid #6272a4;border-radius:4px;padding:10px;max-height:200px;overflow-y:auto;margin-bottom:10px}
+.log-container{background:#282a36;border:1px solid #6272a4;border-radius:4px;padding:10px;max-height:25vh;overflow-y:auto;margin-bottom:10px}
 .log-container::-webkit-scrollbar{width:6px}
 .log-container::-webkit-scrollbar-track{background:#282a36}
 .log-container::-webkit-scrollbar-thumb{background:#6272a4;border-radius:3px}
@@ -146,7 +146,7 @@
 }
 
 #audio-list-container {
-    max-height: 200px;
+    max-height: 30vh;
     overflow-y: auto;
     background: #282a36;
     border: 1px solid #6272a4;
@@ -256,7 +256,7 @@
 
 /* Danh sách lỗi dấu câu */
 #punctuation-issues-list {
-    max-height: 300px;
+    max-height: 35vh;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #6272a4 #282a36;
@@ -482,13 +482,17 @@ body {
 }
 
 #gemini-col-1 {
-    width: 22% !important;
-    min-width: 280px !important;
+    width: 24% !important;
+    min-width: 200px !important;
+    flex: 0 0 24% !important;
+    max-width: 24% !important;
 }
 
 #gemini-col-2 {
-    width: 56% !important;
+    width: calc(52% - 32px) !important;
     min-width: 400px !important;
+    flex: 0 0 calc(52% - 32px) !important;
+    max-width: calc(52% - 32px) !important;
 }
 
 /* Two-column layout for gemini-col-2 */
@@ -552,6 +556,92 @@ body {
     box-sizing: border-box !important;
 }
 
+/* Make main container and columns adapt both width and height */
+#gemini-main-container {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    min-height: 100vh !important;
+}
+.gemini-column {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+}
+
+#gemini-col-1 .column-content,
+#gemini-col-2 .column-content {
+    flex: 1 1 auto !important;
+    overflow: auto !important;
+    min-height: 0 !important;
+}
+
+/* Adaptive heights for key components */
+#gemini-main-textarea {
+    width: 100% !important;
+    min-height: 160px !important;
+    height: clamp(180px, 40vh, 560px) !important;
+    resize: vertical !important;
+}
+
+/* Responsive: adjust columns for medium screens */
+@media (max-width: 1200px) {
+    #gemini-col-1 {
+        width: 36% !important;
+        min-width: 200px !important;
+        flex: 0 0 36% !important;
+        max-width: 36% !important;
+    }
+    #gemini-col-2 {
+        width: calc(28% - 32px) !important;
+        min-width: 380px !important;
+        flex: 0 0 calc(28% - 32px) !important;
+        max-width: calc(28% - 32px) !important;
+    }
+    #gemini-col-3 {
+        width: 36% !important;
+        min-width: 200px !important;
+        flex: 0 0 36% !important;
+        max-width: 36% !important;
+    }
+}
+
+/* Responsive: stack main columns on small screens */
+@media (max-width: 900px) {
+    #gemini-col-1,
+    #gemini-col-2 {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}
+
+/* Responsive: stack inner two-column layout for content area */
+@media (max-width: 992px) {
+    #gemini-col-2 .column-content {
+        flex-direction: column !important;
+        padding: 16px !important;
+    }
+    #gemini-col-2-right {
+        flex: 1 1 auto !important;
+        max-width: 100% !important;
+    }
+}
+
+/* Responsive: tighter paddings for very small screens */
+@media (max-width: 600px) {
+    #gemini-main-container {
+        padding: 10px !important;
+        gap: 10px !important;
+    }
+    .column-header {
+        padding: 12px 14px !important;
+    }
+    #gemini-col-2 .column-content {
+        padding: 12px !important;
+        gap: 12px !important;
+    }
+}
+
 #waveform-play-pause {
     flex: 0 0 auto !important;
     min-width: 50px !important;
@@ -565,8 +655,10 @@ body {
 }
 
 #gemini-col-3 {
-    width: 22% !important;
-    min-width: 280px !important;
+    width: 24% !important;
+    min-width: 200px !important;
+    flex: 0 0 24% !important;
+    max-width: 24% !important;
 }
 
 /* Enhanced Headers */
@@ -921,7 +1013,7 @@ button:disabled {
         
         <div id="gemini-quota-display" style="color: #8be9fd; font-weight: bold; margin-left: 15px; margin-top: 10px; font-size: 14px;">Đang tải quota...</div>
         </div> 
-    <div class="column-content"> <div class="section" style="margin-bottom: 10px!important;"> <h4>1. Tải lên tệp âm thanh (Tối đa 1 file, độ dài 20-60 giây)</h4> <input type="file" id="gemini-file-input" accept=".wav,.mp3,.mpeg,.mp4,.m4a,.avi,.mov,.wmv,.flv,.mkv,.webm"> </div> <div class="section"> <h4>2. Chọn ngôn ngữ</h4> <select id="gemini-language-select"><option value="Vietnamese">Vietnamese</option><option value="English">English</option><option value="Arabic">Arabic</option><option value="Cantonese">Cantonese</option><option value="Chinese (Mandarin)">Chinese (Mandarin)</option><option value="Dutch">Dutch</option><option value="French">French</option><option value="German">German</option><option value="Indonesian">Indonesian</option><option value="Italian">Italian</option><option value="Japanese">Japanese</option><option value="Korean">Korean</option><option value="Portuguese">Portuguese</option><option value="Russian">Russian</option><option value="Spanish">Spanish</option><option value="Turkish">Turkish</option><option value="Ukrainian">Ukrainian</option><option value="Thai">Thai</option><option value="Polish">Polish</option><option value="Romanian">Romanian</option><option value="Greek">Greek</option><option value="Czech">Czech</option><option value="Finnish">Finnish</option><option value="Hindi">Hindi</option><option value="Bulgarian">Bulgarian</option><option value="Danish">Danish</option><option value="Hebrew">Hebrew</option><option value="Malay">Malay</option><option value="Persian">Persian</option><option value="Slovak">Slovak</option><option value="Swedish">Swedish</option><option value="Croatian">Croatian</option><option value="Filipino">Filipino</option><option value="Hungarian">Hungarian</option><option value="Norwegian">Norwegian</option><option value="Slovenian">Slovenian</option><option value="Catalan">Catalan</option><option value="Nynorsk">Nynorsk</option><option value="Tamil">Tamil</option><option value="Afrikaans">Afrikaans</option></select> </div> <div class="section"> <button id="gemini-upload-btn">Tải lên & Cấu hình tự động</button> <div id="gemini-upload-status"></div> </div> <div class="log-section"> <h2>Log hoạt động</h2> <div id="log-container" class="log-container"> <div class="log-entry">Sẵn sàng theo dõi văn bản chunk</div> </div> <button id="clear-log-btn" class="clear-log-btn">Xóa log</button> </div> </div> </div> </div> <div id="gemini-col-2" class="gemini-column"> <div class="column-header box-info-version"><h3>Trình tạo nội dung</h3><div>Version: 15.3 - Update: 27/01/2025 - Tạo bởi: <a href="https://fb.com/HuynhDucLoi/" target="_blank">Huỳnh Đức Lợi</a></div></div> <div class="column-content">     <div id="gemini-col-2-left">     <div class="section text-section"> <h4>Nhập văn bản cần tạo giọng nói</h4>
+    <div class="column-content"> <div class="section" style="margin-bottom: 10px!important;"> <h4>1. Tải lên tệp âm thanh (Tối đa 1 file, độ dài 20-60 giây)</h4> <input type="file" id="gemini-file-input" accept=".wav,.mp3,.mpeg,.mp4,.m4a,.avi,.mov,.wmv,.flv,.mkv,.webm"> </div> <div class="section"> <h4>2. Chọn ngôn ngữ</h4> <select id="gemini-language-select"><option value="Vietnamese">Vietnamese</option><option value="English">English</option><option value="Arabic">Arabic</option><option value="Cantonese">Cantonese</option><option value="Chinese (Mandarin)">Chinese (Mandarin)</option><option value="Dutch">Dutch</option><option value="French">French</option><option value="German">German</option><option value="Indonesian">Indonesian</option><option value="Italian">Italian</option><option value="Japanese">Japanese</option><option value="Korean">Korean</option><option value="Portuguese">Portuguese</option><option value="Russian">Russian</option><option value="Spanish">Spanish</option><option value="Turkish">Turkish</option><option value="Ukrainian">Ukrainian</option><option value="Thai">Thai</option><option value="Polish">Polish</option><option value="Romanian">Romanian</option><option value="Greek">Greek</option><option value="Czech">Czech</option><option value="Finnish">Finnish</option><option value="Hindi">Hindi</option><option value="Bulgarian">Bulgarian</option><option value="Danish">Danish</option><option value="Hebrew">Hebrew</option><option value="Malay">Malay</option><option value="Persian">Persian</option><option value="Slovak">Slovak</option><option value="Swedish">Swedish</option><option value="Croatian">Croatian</option><option value="Filipino">Filipino</option><option value="Hungarian">Hungarian</option><option value="Norwegian">Norwegian</option><option value="Slovenian">Slovenian</option><option value="Catalan">Catalan</option><option value="Nynorsk">Nynorsk</option><option value="Tamil">Tamil</option><option value="Afrikaans">Afrikaans</option></select> </div> <div class="section"> <button id="gemini-upload-btn">Tải lên & Cấu hình tự động</button> <div id="gemini-upload-status"></div> </div> <div class="log-section"> <h2>Log hoạt động</h2> <div id="log-container" class="log-container"> <div class="log-entry">Sẵn sàng theo dõi văn bản chunk</div> </div> <button id="clear-log-btn" class="clear-log-btn">Xóa log</button> </div> </div> </div> </div> <div id="gemini-col-2" class="gemini-column"> <div class="column-header box-info-version"><h3>Trình tạo nội dung</h3><div>Version: 21.0 - Update: 27/01/2025 - Tạo bởi: <a href="https://fb.com/HuynhDucLoi/" target="_blank">Huỳnh Đức Lợi</a></div></div> <div class="column-content">     <div id="gemini-col-2-left">     <div class="section text-section"> <h4>Nhập văn bản cần tạo giọng nói</h4>
     <div class="text-input-options">
         <div class="input-tabs">
             <button id="text-tab" class="tab-btn active">Nhập trực tiếp</button>
@@ -983,100 +1075,7 @@ button:disabled {
         </small>
     </div>
 
-<button id="gemini-merge-btn">Ghép đoạn hội thoại</button>
-<button id="gemini-start-queue-btn" disabled>Bắt đầu tạo âm thanh</button>
-
-<button
-  id="apply-punctuation-btn"
-  style="display:none; background-color:#ffb86c; color:#282a36; margin-top:10px;"
->
-  Áp dụng thiết lập dấu câu
-</button>
-
-<button id="gemini-pause-btn" style="display:none;">Tạm dừng</button>
-<button id="gemini-stop-btn" style="display:none;">Dừng hẳn</button>
-
-<div id="gemini-progress-container" style="display:none;">
-  <div id="gemini-progress-bar"></div>
-  <span id="gemini-progress-label">0%</span>
-</div>
-
-<div id="gemini-final-result" style="display:none;">
-  <h4>Kết quả cuối cùng</h4>
-  <div id="gemini-time-taken"></div>
-  <div id="gemini-waveform"></div>
-
-  <div id="waveform-controls" style="display:none;">
-    <button id="waveform-play-pause">▶️</button>
-    <a
-      id="gemini-download-merged-btn"
-      href="#"
-      download="merged_output.mp3"
-    >
-      Tải xuống âm thanh
-    </a>
-    <button
-      id="gemini-download-chunks-btn"
-      style="display:none; background-color:#ffb86c; color:#282a36;"
-    >
-      Tải các chunk (ZIP)
-    </button>
-  </div>
-</div>
-
-<!-- (Các thẻ </div> dưới đây có thể là closing cho wrapper bên ngoài, giữ nguyên nếu layout đang dùng) -->
-</div>
-</div>
-</div>
-
-<div id="gemini-col-3" class="gemini-column">
-  <div class="column-header">
-    <h3></h3>
-  </div>
-
-  <div class="column-content banner-column">
-    <div class="section">
-      <button
-        id="open-audio-manager-btn"
-        style="
-          background-color:#8be9fd;
-          color:#282a36;
-          width:100%;
-          padding:14px 20px;
-          border:none;
-          border-radius:8px;
-          font-weight:700;
-          font-size:15px;
-          cursor:pointer;
-          transition:all 0.3s ease;
-          margin-bottom:15px;
-        "
-      >
-        📂 Mở Kho Âm Thanh (Online)
-      </button>
-    </div>
-
-    <div id="batch-replace-section">
-      <h4>Đổi văn bản hàng loạt</h4>
-      <div id="batch-replace-pairs"></div>
-
-      <div id="batch-replace-actions">
-        <button id="add-replace-pair-btn" title="Thêm cặp từ">+</button>
-        <button id="execute-replace-btn">Thực hiện đổi</button>
-      </div>
-    </div>
-
-    <button id="open-punctuation-settings-btn">
-      Thiết lập dấu câu
-    </button>
-  </div>
-</div>
-
-<textarea
-  id="gemini-hidden-text-for-request"
-  style="display:none;"
-></textarea>
-
+<button id="gemini-merge-btn">Ghép đoạn hội thoại</button> <button id="gemini-start-queue-btn" disabled>Bắt đầu tạo âm thanh</button> <button id="apply-punctuation-btn" style="display:none; background-color: #ffb86c; color: #282a36; margin-top: 10px;">Áp dụng thiết lập dấu câu</button> <button id="gemini-pause-btn" style="display:none;">Tạm dừng</button> <button id="gemini-stop-btn" style="display:none;">Dừng hẳn</button> <div id="gemini-progress-container" style="display:none;"><div id="gemini-progress-bar"></div><span id="gemini-progress-label">0%</span></div> <div id="gemini-final-result" style="display:none;"> <h4>Kết quả cuối cùng</h4> <div id="gemini-time-taken"></div> <div id="gemini-waveform"></div> <div id="waveform-controls" style="display:none;"><button id="waveform-play-pause">▶️</button><a id="gemini-download-merged-btn" href="#" download="merged_output.mp3">Tải xuống âm thanh</a><button id="gemini-download-chunks-btn" style="display: none; background-color: #ffb86c; color: #282a36;">Tải các chunk (ZIP)</button></div> </div> </div> </div> </div> <div id="gemini-col-3" class="gemini-column"> <div class="column-header"><h3></h3></div> <div class="column-content banner-column"> <div class="section"> <button id="open-audio-manager-btn" style="background-color: #8be9fd; color: #282a36; width: 100%; padding: 14px 20px; border: none; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s ease; margin-bottom: 15px;">📂 Mở Kho Âm Thanh (Online)</button> </div><div id="batch-replace-section"><h4>Đổi văn bản hàng loạt</h4><div id="batch-replace-pairs"></div><div id="batch-replace-actions"><button id="add-replace-pair-btn" title="Thêm cặp từ">+</button><button id="execute-replace-btn">Thực hiện đổi</button></div></div> <button id="open-punctuation-settings-btn">Thiết lập dấu câu</button> </div> </div>     <textarea id="gemini-hidden-text-for-request" style="display:none;"></textarea>
 
     <!-- Modal Kho Âm Thanh Online -->
     <div id="audio-manager-modal" class="punctuation-modal" style="display:none;">
@@ -1565,8 +1564,9 @@ function normalizeChunkText(text) {
         // Bước 1: Chỉ loại bỏ ký tự điều khiển và ký tự không hợp lệ
         // GIỮ LẠI TẤT CẢ ký tự Unicode (tiếng Việt, Nhật, Hàn, Trung, Thái, Ả Rập, v.v.)
         let normalized = text
-            // Loại bỏ các ký tự control và invisible (có thể gây lỗi)
-            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+            // Loại bỏ các ký tự control và invisible (có thể gây lỗi),
+            // NHƯNG GIỮ \t (09), \n (0A), \r (0D) để còn chuyển về một khoảng trắng sau đó
+            .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
             // Xóa tất cả dấu * nếu có
             .replace(/\*/g, '')
             // Xóa tất cả dấu "" nếu có (bao gồm dấu nháy đơn và nháy kép "xéo")
@@ -2086,6 +2086,8 @@ async function uSTZrHUt_IC() {
     if (typeof window.isFinalCheck === 'undefined') window.isFinalCheck = false;
     if (typeof window.retryCount === 'undefined') window.retryCount = 0;
     if (typeof window.totalRetryAttempts === 'undefined') window.totalRetryAttempts = 0;
+    // Theo dõi lỗi chunk 1 để kiểm tra cấu hình
+    if (typeof window.chunk1Failed === 'undefined') window.chunk1Failed = false;
 
     // Đảm bảo mảng chunkStatus có đủ phần tử
     while (window.chunkStatus.length < SI$acY.length) {
@@ -2120,16 +2122,142 @@ async function uSTZrHUt_IC() {
         }
 
 
-        // Tạo ra các khả năng có thể có cho tên nút
+        // Logic thông minh: Tìm bất kỳ nút nào có sẵn để gửi chunk
+        // Thay vì tìm kiếm cứng nhắc, script sẽ tìm nút Generate hoặc Regenerate tùy theo nút nào có sẵn
         const possibleGenerateTexts = ['Generate', 'Tạo'];
         const possibleRegenerateTexts = ['Regenerate', 'Tạo lại'];
-        const buttonTexts = (ttuo$y_KhCV === 0) ? possibleGenerateTexts : possibleRegenerateTexts;
-
-        // Gọi hàm "bộ não" đã nâng cấp
-        const targetButton = await waitForButton(buttonTexts);
+        const allButtonTexts = [...possibleGenerateTexts, ...possibleRegenerateTexts];
+        
+        // Ưu tiên: Nếu chunk = 0 thì ưu tiên Generate, nếu chunk > 0 thì ưu tiên Regenerate
+        // Nhưng nếu không tìm thấy nút ưu tiên, sẽ tìm bất kỳ nút nào có sẵn
+        let targetButton = null;
+        let preferredButtonTexts = (ttuo$y_KhCV === 0) ? possibleGenerateTexts : possibleRegenerateTexts;
+        
+        // Chờ bất kỳ nút nào xuất hiện trước (nhanh hơn)
+        addLogEntry(`🔍 [Chunk ${ttuo$y_KhCV + 1}] Đang chờ nút xuất hiện...`, 'info');
+        await waitForButton(allButtonTexts); // Chờ bất kỳ nút nào xuất hiện
+        
+        // Sau khi nút đã xuất hiện, tìm nút ưu tiên hoặc bất kỳ nút nào có sẵn
+        const stableButtonSelector = '.clone-voice-ux-v2 button.ant-btn, button[class*="ant-btn"], .ant-btn, button';
+        const buttons = document.querySelectorAll(stableButtonSelector);
+        
+        let preferredButton = null;
+        let anyAvailableButton = null;
+        
+        for (const btn of buttons) {
+            if (btn.offsetParent === null || btn.disabled) continue; // Bỏ qua nút ẩn hoặc bị khóa
+            
+            const btnText = (btn.textContent || btn.innerText || '').toLowerCase().trim();
+            
+            // Kiểm tra nút ưu tiên
+            if (!preferredButton && preferredButtonTexts.some(text => btnText.includes(text.toLowerCase()))) {
+                preferredButton = btn;
+            }
+            
+            // Kiểm tra bất kỳ nút nào
+            if (!anyAvailableButton && allButtonTexts.some(text => btnText.includes(text.toLowerCase()))) {
+                anyAvailableButton = btn;
+            }
+        }
+        
+        // Sử dụng nút ưu tiên nếu có, nếu không thì dùng nút có sẵn
+        if (preferredButton) {
+            targetButton = preferredButton;
+            addLogEntry(`✅ [Chunk ${ttuo$y_KhCV + 1}] Đã tìm thấy nút ưu tiên: "${targetButton.textContent}"`, 'success');
+        } else if (anyAvailableButton) {
+            targetButton = anyAvailableButton;
+            addLogEntry(`✅ [Chunk ${ttuo$y_KhCV + 1}] Đã tìm thấy nút thay thế: "${targetButton.textContent}" (nút ưu tiên không có sẵn)`, 'success');
+        } else {
+            throw new Error(`Không tìm thấy bất kỳ nút nào để gửi chunk!`);
+        }
 
         // ANTI-DETECTION: Thêm delay ngẫu nhiên trước khi đặt text
         await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500));
+        
+        // =======================================================
+        // == CLEAR TEXTAREA VÀ AUDIO CONTEXT TRƯỚC KHI GỬI CHUNK ==
+        // =======================================================
+        // Clear textarea để tránh lỗi âm thanh lạ khi render
+        const textarea = document.getElementById('gemini-hidden-text-for-request');
+        if (textarea) {
+            textarea.value = '';
+            addLogEntry(`🧹 [Chunk ${ttuo$y_KhCV + 1}] Đã clear textarea trước khi gửi`, 'info');
+        }
+        
+        // Clear audio context và các audio elements để tránh lỗi âm thanh lạ
+        try {
+            // Dừng tất cả các audio elements đang phát
+            const audioElements = document.querySelectorAll('audio');
+            let stoppedCount = 0;
+            audioElements.forEach(audio => {
+                try {
+                    if (!audio.paused) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                        stoppedCount++;
+                    }
+                    // Reset audio source nếu có
+                    if (audio.src) {
+                        audio.src = '';
+                    }
+                } catch (e) {
+                    // Bỏ qua lỗi từng audio element
+                }
+            });
+            
+            // Clear source elements
+            const sourceElements = document.querySelectorAll('source');
+            sourceElements.forEach(source => {
+                try {
+                    if (source.src) {
+                        source.src = '';
+                    }
+                } catch (e) {
+                    // Bỏ qua lỗi
+                }
+            });
+            
+            // Clear Web Audio API context nếu có (thông qua window)
+            if (window.audioContext) {
+                try {
+                    if (window.audioContext.state !== 'closed') {
+                        window.audioContext.close();
+                    }
+                    window.audioContext = null;
+                } catch (e) {
+                    // Bỏ qua nếu không thể đóng
+                }
+            }
+            
+            // Clear các biến audio context khác có thể có
+            if (window.AudioContext || window.webkitAudioContext) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                // Tìm và clear các AudioContext được lưu trong window
+                Object.keys(window).forEach(key => {
+                    try {
+                        const value = window[key];
+                        if (value && typeof value === 'object' && typeof value.close === 'function' && typeof value.state === 'string') {
+                            // Có thể là AudioContext
+                            if (value.state !== 'closed') {
+                                value.close();
+                            }
+                            window[key] = null;
+                        }
+                    } catch (e) {
+                        // Bỏ qua
+                    }
+                });
+            }
+            
+            if (stoppedCount > 0) {
+                addLogEntry(`🧹 [Chunk ${ttuo$y_KhCV + 1}] Đã dừng ${stoppedCount} audio element(s) và clear audio context`, 'info');
+            }
+        } catch (audioError) {
+            addLogEntry(`⚠️ [Chunk ${ttuo$y_KhCV + 1}] Lỗi khi clear audio: ${audioError.message}`, 'warning');
+        }
+        
+        // Chờ một chút để đảm bảo clear hoàn tất
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         // =======================================================
         // == CHUẨN HÓA VĂN BẢN TRƯỚC KHI GỬI CHUNK ==
@@ -2255,8 +2383,65 @@ async function uSTZrHUt_IC() {
             if (!window.failedChunks.includes(ttuo$y_KhCV)) {
                 window.failedChunks.push(ttuo$y_KhCV);
             }
+            
+            // KIỂM TRA LỖI CẤU HÌNH: Nếu chunk 1 (index 0) lỗi, đánh dấu
+            if (ttuo$y_KhCV === 0) {
+                window.chunk1Failed = true;
+                addLogEntry(`⚠️ [Chunk 1] Đã bị lỗi. Sẽ kiểm tra chunk 2...`, 'warning');
+            }
+            
             window.retryCount = 0; // Reset bộ đếm retry
             ttuo$y_KhCV++; // Chuyển sang chunk tiếp theo
+            
+            // KIỂM TRA LỖI CẤU HÌNH: Nếu chunk 1 đã lỗi và chunk 2 (index 1) cũng lỗi
+            if (window.chunk1Failed && ttuo$y_KhCV === 1) {
+                addLogEntry(`🚨 [LỖI CẤU HÌNH] Chunk 1 đã lỗi và Chunk 2 cũng không render thành công!`, 'error');
+                addLogEntry(`💡 Tool yêu cầu: Vui lòng F5 (Refresh) trang và thao tác lại từ đầu!`, 'error');
+                
+                // Hiển thị thông báo lỗi cấu hình
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: '🚨 Lỗi Cấu Hình',
+                        html: `
+                            <div style="text-align: left;">
+                                <p><strong>Chunk 1 và Chunk 2 đều không render thành công!</strong></p>
+                                <hr>
+                                <p><strong>⚠️ Nguyên nhân có thể:</strong></p>
+                                <ul>
+                                    <li>Cấu hình web chưa đúng</li>
+                                    <li>File âm thanh chưa được tải lên đúng cách</li>
+                                    <li>Trạng thái web không ổn định</li>
+                                </ul>
+                                <hr>
+                                <p><strong>💡 Giải pháp:</strong></p>
+                                <ol>
+                                    <li>Nhấn <strong>F5</strong> để refresh trang</li>
+                                    <li>Tải lại file âm thanh</li>
+                                    <li>Thao tác lại từ đầu</li>
+                                </ol>
+                                <hr>
+                                <p style="color: #ff6b6b;"><strong>Lưu ý:</strong> Tính năng này chỉ áp dụng cho chunk 1. Các chunk khác không bị ảnh hưởng.</p>
+                            </div>
+                        `,
+                        icon: 'error',
+                        width: '600px',
+                        confirmButtonText: 'Đã hiểu - Sẽ F5',
+                        confirmButtonColor: '#ff6b6b',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    });
+                }
+                
+                // Reset flag sau khi hiển thị thông báo
+                window.chunk1Failed = false;
+                return; // Dừng xử lý
+            }
+            
+            // KIỂM TRA LỖI CẤU HÌNH: Nếu chunk 1 đã lỗi và đang chuyển sang chunk 2
+            if (window.chunk1Failed && ttuo$y_KhCV === 1) {
+                addLogEntry(`⚠️ [Chunk 2] Đang kiểm tra cấu hình... Nếu chunk 2 cũng không render thành công, tool sẽ yêu cầu F5.`, 'warning');
+            }
+            
             addLogEntry(`➡️ Chuyển sang chunk ${ttuo$y_KhCV + 1}...`, 'info');
             addLogEntry(`📊 Trạng thái: ${window.chunkStatus.filter(s => s === 'success' || s === 'failed').length}/${SI$acY.length} chunks đã xử lý`, 'info');
             setTimeout(uSTZrHUt_IC, 2000); // Tiếp tục với chunk tiếp theo
@@ -2345,9 +2530,66 @@ async function uSTZrHUt_IC() {
             if (!window.failedChunks.includes(ttuo$y_KhCV)) {
                 window.failedChunks.push(ttuo$y_KhCV);
             }
+            
+            // KIỂM TRA LỖI CẤU HÌNH: Nếu chunk 1 (index 0) timeout, đánh dấu
+            if (ttuo$y_KhCV === 0) {
+                window.chunk1Failed = true;
+                addLogEntry(`⚠️ [Chunk 1] Đã timeout. Sẽ kiểm tra chunk 2...`, 'warning');
+            }
+            
+            // KIỂM TRA LỖI CẤU HÌNH: Nếu chunk 1 đã lỗi và chunk 2 (index 1) cũng timeout
+            if (window.chunk1Failed && ttuo$y_KhCV === 1) {
+                addLogEntry(`🚨 [LỖI CẤU HÌNH] Chunk 1 đã lỗi và Chunk 2 cũng không render thành công!`, 'error');
+                addLogEntry(`💡 Tool yêu cầu: Vui lòng F5 (Refresh) trang và thao tác lại từ đầu!`, 'error');
+                
+                // Hiển thị thông báo lỗi cấu hình
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: '🚨 Lỗi Cấu Hình',
+                        html: `
+                            <div style="text-align: left;">
+                                <p><strong>Chunk 1 và Chunk 2 đều không render thành công!</strong></p>
+                                <hr>
+                                <p><strong>⚠️ Nguyên nhân có thể:</strong></p>
+                                <ul>
+                                    <li>Cấu hình web chưa đúng</li>
+                                    <li>File âm thanh chưa được tải lên đúng cách</li>
+                                    <li>Trạng thái web không ổn định</li>
+                                </ul>
+                                <hr>
+                                <p><strong>💡 Giải pháp:</strong></p>
+                                <ol>
+                                    <li>Nhấn <strong>F5</strong> để refresh trang</li>
+                                    <li>Tải lại file âm thanh</li>
+                                    <li>Thao tác lại từ đầu</li>
+                                </ol>
+                                <hr>
+                                <p style="color: #ff6b6b;"><strong>Lưu ý:</strong> Tính năng này chỉ áp dụng cho chunk 1. Các chunk khác không bị ảnh hưởng.</p>
+                            </div>
+                        `,
+                        icon: 'error',
+                        width: '600px',
+                        confirmButtonText: 'Đã hiểu - Sẽ F5',
+                        confirmButtonColor: '#ff6b6b',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    });
+                }
+                
+                // Reset flag sau khi hiển thị thông báo
+                window.chunk1Failed = false;
+                return; // Dừng xử lý
+            }
+            
             // Reset retry count cho chunk này
             window.timeoutRetryCount[ttuo$y_KhCV] = 0;
             ttuo$y_KhCV++; // Chuyển sang chunk tiếp theo
+            
+            // KIỂM TRA LỖI CẤU HÌNH: Nếu chunk 1 đã lỗi và đang chuyển sang chunk 2
+            if (window.chunk1Failed && ttuo$y_KhCV === 1) {
+                addLogEntry(`⚠️ [Chunk 2] Đang kiểm tra cấu hình... Nếu chunk 2 cũng không render thành công, tool sẽ yêu cầu F5.`, 'warning');
+            }
+            
             addLogEntry(`➡️ Chuyển sang chunk ${ttuo$y_KhCV + 1}...`, 'info');
             addLogEntry(`📊 Trạng thái: ${window.chunkStatus.filter(s => s === 'success' || s === 'failed').length}/${SI$acY.length} chunks đã xử lý`, 'info');
             setTimeout(uSTZrHUt_IC, 2000); // Tiếp tục với chunk tiếp theo
@@ -2370,6 +2612,12 @@ async function uSTZrHUt_IC() {
                         window.timeoutRetryCount[ttuo$y_KhCV] = 0;
                     }
                     window.chunkStatus[ttuo$y_KhCV] = 'success'; // Đánh dấu chunk này đã thành công
+                    
+                    // Reset flag chunk1Failed nếu chunk 1 thành công
+                    if (ttuo$y_KhCV === 0) {
+                        window.chunk1Failed = false;
+                        addLogEntry(`✅ [Chunk 1] Đã thành công - Reset flag kiểm tra cấu hình`, 'success');
+                    }
 
                     // Nếu đang trong giai đoạn kiểm tra cuối, loại bỏ chunk này khỏi danh sách thất bại
                     if (window.isFinalCheck && window.failedChunks.includes(ttuo$y_KhCV)) {
@@ -3100,6 +3348,17 @@ async function waitForVoiceModelReady() {
                     // Xóa dấu câu giữa hai hàm pause liên tiếp
                     textToProcess = textToProcess.replace(/#>\s*[.,;:!?…]+\s*<#/g, '#> <#');
                 }
+                
+                // HẬU XỬ LÝ: Sửa các thẻ pause bị vỡ và gộp trùng tại cùng một vị trí
+                // 1) Xóa mảnh vỡ dạng "<# 2 " đứng ngay trước một thẻ pause hợp lệ
+                textToProcess = textToProcess.replace(/<#\s*\d+(?:\.\d+)?\s+(<#[0-9.]+#>)/g, '$1');
+                // 2) Xóa mảnh vỡ dạng " 5 #>" đứng ngay sau một thẻ pause hợp lệ
+                textToProcess = textToProcess.replace(/(<#[0-9.]+#>)\s*\d+(?:\.\d+)?\s*#>/g, '$1');
+                // 3) Nếu có nhiều thẻ pause liên tiếp, chỉ giữ lại thẻ CUỐI CÙNG
+                textToProcess = textToProcess.replace(/(?:<#[0-9.]+#>\s*){2,}/g, (m) => {
+                    const tags = m.match(/<#[0-9.]+#>/g);
+                    return tags ? (tags[tags.length - 1] + ' ') : m;
+                });
                 
                 // Normalize lại khoảng trắng sau khi xử lý tất cả dấu câu
                 textToProcess = textToProcess.replace(/\s+/g, ' ').trim();
@@ -4188,6 +4447,8 @@ async function waitForVoiceModelReady() {
                         dropdownList.style.backgroundColor = '#2d2d2d';
                         dropdownList.style.border = '1px solid #444';
                     }
+
+                    console.log('✅ Đã fix dropdown ngôn ngữ:', dropdown);
                 }
             });
         }
@@ -4329,6 +4590,7 @@ async function waitForVoiceModelReady() {
 
             // Reset hệ thống theo dõi chunk của cơ chế legacy
             window.chunkStatus = new Array(SI$acY.length).fill('pending');
+            window.chunk1Failed = false; // Reset flag kiểm tra lỗi cấu hình chunk 1
             window.failedChunks = [];
             window.isFinalCheck = false;
             window.retryCount = 0;
@@ -4712,52 +4974,3 @@ async function waitForVoiceModelReady() {
             errorObserver.disconnect();
         }
     });
-
-//QuyenPN - Add để điều khiển trên python
-;(function () {
-  try {
-    // chỉ inject 1 lần
-    if (window.__mini_helpers_injected) return;
-    // 2) Hàm set value + phát event (React-friendly)
-    window.setGeminiText = function (text) {
-      try {
-        var el = document.getElementById('gemini-main-textarea');
-        if (!el) return { ok: false, reason: 'textarea not found' };
-
-        var desc = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
-        if (desc && typeof desc.set === 'function') {
-          desc.set.call(el, text);
-        } else {
-          el.value = text;
-        }
-        el.focus();
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
-        el.blur();
-        return { ok: true };
-      } catch (e) {
-        return { ok: false, reason: String(e) };
-      }
-    };
-
-    // 3) (tuỳ chọn) click theo text
-    window.clickByText = function (txt) {
-      try {
-        txt = String(txt || '').toLowerCase();
-        var els = Array.from(document.querySelectorAll('button,[role="button"],a,input[type="button"],input[type="submit"]'));
-        for (var el of els) {
-          var t = ((el.innerText || el.textContent || el.value || '') + '').trim().toLowerCase();
-          if (t.includes(txt)) { el.click(); return { ok: true }; }
-        }
-        return { ok: false, reason: 'no match: ' + txt };
-      } catch (e) {
-        return { ok: false, reason: String(e) };
-      }
-    };
-
-    window.__mini_helpers_injected = true;
-    window.myScriptInjected = true; // để bạn check từ Python
-  } catch (e) {
-    console.error('[Mini inject error]', e);
-  }
-})();

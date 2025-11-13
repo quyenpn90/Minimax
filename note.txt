@@ -1,0 +1,5 @@
+Link down file voice mẫu
+https://cloud.appwrite.io/v1/storage/buckets/6904f5d60014d41970a2/files/6914a9b600365e55efd4/view?project=6904f537002b8df7dd89
+
+https://cloud.appwrite.io/v1/storage/buckets/{bucketId}/files/{id}/view?project={projectid}
+--header 'x-appwrite-project: 6904f537002b8df7dd89' \ projectid
