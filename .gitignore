@@ -1,0 +1,8 @@
+profiles/
+Resource/
+venv/
+output/
+ffmpeg.exe
+ffprobe.exe
+debug.log
+script/script.js_bk
